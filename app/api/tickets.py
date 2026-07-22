@@ -1,35 +1,75 @@
-from fastapi import APIRouter, HTTPException
+from uuid import UUID
 
-from app.schemas.ticket import TicketCreate, TicketUpdate, Ticket
+from fastapi import APIRouter, Depends, status
+
+from app.core.deps import get_ticket_service
+from app.schemas.ticket import (
+    TicketCreate,
+    TicketResponse,
+    TicketUpdate,
+)
 from app.services.ticket_service import TicketService
 
-router = APIRouter(prefix="/tickets")
 
-@router.post("/", response_model=Ticket)
-def create_ticket(ticket: TicketCreate):
-    return TicketService.create_ticket(ticket)
+router = APIRouter(
+    prefix="/tickets",
+    tags=["Tickets"],
+)
 
-@router.get("/", response_model=list[Ticket])
-def get_all_tickets():
-    return TicketService.get_all_ticket()
 
-@router.get("/{ticket_id}", response_model=Ticket)
-def get_ticket(ticket_id: int):
-    ticket = TicketService.get_ticket(ticket_id)
-    if ticket is None:
-        raise HTTPException(status_code=404, detail="Ticket not found")
-    return ticket
+@router.post(
+    "/",
+    response_model=TicketResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_ticket(
+    ticket_data: TicketCreate,
+    service: TicketService = Depends(get_ticket_service),
+):
+    return await service.create_ticket(ticket_data)
 
-@router.put("/{ticket_id}", response_model=Ticket)
-def update_ticket(ticket_id: int, ticket: TicketUpdate):
-    updated = TicketService.update_ticket(ticket_id, ticket)
-    if updated is None:
-        raise HTTPException(status_code=404, detail="Ticket not found")
-    return updated
+
+@router.get(
+    "/",
+    response_model=list[TicketResponse],
+)
+async def get_all_tickets(
+    service: TicketService = Depends(get_ticket_service),
+):
+    return await service.get_all_tickets()
+
+
+@router.get(
+    "/{ticket_id}",
+    response_model=TicketResponse,
+)
+async def get_ticket(
+    ticket_id: UUID,
+    service: TicketService = Depends(get_ticket_service),
+):
+    return await service.get_ticket(ticket_id)
+
+
+@router.patch(
+    "/{ticket_id}",
+    response_model=TicketResponse,
+)
+async def update_ticket(
+    ticket_id: UUID,
+    ticket_data: TicketUpdate,
+    service: TicketService = Depends(get_ticket_service),
+):
+    return await service.update_ticket(ticket_id, ticket_data)
+
 
 @router.delete("/{ticket_id}")
-def delete(ticket_id: int):
-    remove = TicketService.delete_ticket(ticket_id)
-    if remove is None:
-        raise HTTPException(status_code=404, detail="Ticket not found")
-    return {"message": "Ticket deleted successfully"}
+async def delete_ticket(
+    ticket_id: UUID,
+    service: TicketService = Depends(get_ticket_service),
+):
+    await service.delete_ticket(ticket_id)
+
+    return {
+        "message": "Ticket deleted successfully",
+        "ticket_id": str(ticket_id),
+    }
