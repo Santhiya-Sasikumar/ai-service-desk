@@ -11,7 +11,6 @@ from app.core.config import settings
 from app.core.exceptions import TicketNotFoundError, TicketStateError
 from app.db.database import engine
 from app.api.ai import router   
-from app.middleware.response_time import add_response_time
 
 
 @asynccontextmanager
@@ -36,10 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
-app.middleware("http")(add_response_time)
 
 
 @app.exception_handler(TicketNotFoundError)

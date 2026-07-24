@@ -16,9 +16,9 @@ TEST_DATABASE_URL = settings.DATABASE_URL.replace(
     "ai_service_desk", "ai_service_desk_test"
 )
 
-# Fallback to localhost when running tests locally on Windows host
-if sys.platform == "win32" and "host.docker.internal" in TEST_DATABASE_URL:
-    TEST_DATABASE_URL = TEST_DATABASE_URL.replace("host.docker.internal", "localhost")
+# # Fallback to localhost when running tests locally on Windows host
+# if sys.platform == "win32" and "host.docker.internal" in TEST_DATABASE_URL:
+#     TEST_DATABASE_URL = TEST_DATABASE_URL.replace("host.docker.internal", "localhost")
 
 engine = create_async_engine(
     TEST_DATABASE_URL,
