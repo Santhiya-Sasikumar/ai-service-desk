@@ -82,3 +82,10 @@ class TicketResponse(BaseModel):
     assignee_email: str | None
     created_at: datetime
     updated_at: datetime
+class SummarizeRequest(BaseModel):
+    ticket_description: str = Field(min_length=1, max_length=5_000)
+ 
+ 
+class SummarizeResponse(BaseModel):
+    summary: str
+    suggested_response: str

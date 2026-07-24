@@ -61,15 +61,12 @@ async def update_ticket(
 ):
     return await service.update_ticket(ticket_id, ticket_data)
 
-
-@router.delete("/{ticket_id}")
+@router.delete(
+    "/{ticket_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_ticket(
     ticket_id: UUID,
     service: TicketService = Depends(get_ticket_service),
 ):
     await service.delete_ticket(ticket_id)
-
-    return {
-        "message": "Ticket deleted successfully",
-        "ticket_id": str(ticket_id),
-    }

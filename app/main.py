@@ -10,6 +10,8 @@ from app.api.tickets import router as ticket_router
 from app.core.config import settings
 from app.core.exceptions import TicketNotFoundError, TicketStateError
 from app.db.database import engine
+from app.api.ai import router   
+from app.middleware.response_time import add_response_time
 
 
 @asynccontextmanager
@@ -35,23 +37,9 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
-async def add_response_time(
-    request: Request,
-    call_next,
-):
-    start_time = time.perf_counter()
 
-    response = await call_next(request)
 
-    elapsed_ms = round(
-        (time.perf_counter() - start_time) * 1000,
-        2,
-    )
-
-    response.headers["X-Response-Time"] = f"{elapsed_ms}ms"
-
-    return response
+app.middleware("http")(add_response_time)
 
 
 @app.exception_handler(TicketNotFoundError)
@@ -112,3 +100,8 @@ app.include_router(
     ticket_router,
     prefix="/api/v1",
 )
+app.include_router(
+    router,
+    prefix="/api/v1",
+    tags=["AI"],    )
+
