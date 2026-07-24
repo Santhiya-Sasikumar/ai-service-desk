@@ -11,18 +11,18 @@ class TicketApiUser(HttpUser):
  
     @task(2)
     def list_tickets(self) -> None:
-        self.client.get("/tickets", name="GET /tickets")
+        self.client.get("/api/v1/tickets/", name="GET /tickets")
  
     @task(1)
     def create_ticket(self) -> None:
         self.client.post(
-            "/tickets",
-            name="POST /tickets",
+            "/api/v1/tickets",
+            name="POST  api/v1/tickets/",
             json={
                 "title": "Load test ticket",
                 "description": "A realistic ticket created by a simulated user.",
-                "severity": 3,
-                "customer_type": "premium",
+                "priority": "medium",
+                "customer_type": "mail@gmail.com",
             },
         )
  

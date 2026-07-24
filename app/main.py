@@ -35,8 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 @app.exception_handler(TicketNotFoundError)
 async def ticket_not_found_handler(
     request: Request,
